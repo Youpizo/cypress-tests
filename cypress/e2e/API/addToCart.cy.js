@@ -53,4 +53,63 @@ describe("Ajout de produits au panier", () => {
             cy.log("Produit en rupture de stock non ajouté au panier");
         });
     });
+
+    it("Ajouter une quantité de 0 au panier", () => {
+        const productId = 5; // Remplacez par un ID de produit disponible
+
+        cy.request({
+            method: "PUT",
+            url: "http://localhost:8081/orders/add",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            body: {
+                product: productId,
+                quantity: 0
+            },
+            failOnStatusCode: false // Permet de capturer les erreurs sans échec du test
+        }).then((response) => {
+            expect(response.status).to.eq(400); // Vérifie que l'ajout est refusé
+            cy.log("Quantité de 0 non ajoutée au panier");
+        });
+    });
+
+    it("Ajouter une quantité négative au panier", () => {
+        const productId = 5; // Remplacez par un ID de produit disponible
+
+        cy.request({
+            method: "PUT",
+            url: "http://localhost:8081/orders/add",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            body: {
+                product: productId,
+                quantity: -1
+            },
+            failOnStatusCode: false // Permet de capturer les erreurs sans échec du test
+        }).then((response) => {
+            expect(response.status).to.eq(400); // Vérifie que l'ajout est refusé
+            cy.log("Quantité négative non ajoutée au panier");
+        });
+    });
+    it("Ajouter une quantité excessive au panier", () => {
+        const productId = 5; // Remplacez par un ID de produit disponible
+
+        cy.request({
+            method: "PUT",
+            url: "http://localhost:8081/orders/add",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            body: {
+                product: productId,
+                quantity: 100000
+            },
+            failOnStatusCode: false // Permet de capturer les erreurs sans échec du test
+        }).then((response) => {
+            expect(response.status).to.eq(400); // Vérifie que l'ajout est refusé
+            cy.log("Quantité excessive non ajoutée au panier");
+        });
+    });
 });

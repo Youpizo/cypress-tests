@@ -45,4 +45,26 @@ describe("Ajout d'un avis produit", () => {
             });
         }
     });
+
+    it("Tester une faille XSS lors de l'ajout d'un avis", () => {
+        const xssScript = "<script>alert('XSS')</script>";
+
+        cy.request({
+            method: "POST",
+            url: "http://localhost:8081/reviews",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            body: {
+                title: xssScript,
+                comment: xssScript,
+                rating: 1,
+            },
+            failOnStatusCode: false // Permet de capturer les erreurs sans que le test échoue
+        }).then((response) => {
+            // Vérifie que l'application bloque ou filtre le script
+            expect(response.status).to.be.oneOf([400, 422, 500]); // Statut d'erreur attendu
+            cy.log("Faille XSS non publie");
+        });
+    });
 });
